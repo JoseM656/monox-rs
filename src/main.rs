@@ -1,4 +1,4 @@
-use clap::Parser;
+use clap::{Parser, CommandFactory};
 use cli::Cli;
 
 mod cli;
@@ -9,7 +9,16 @@ fn main() {
     // process input
     let cli = Cli::parse();
 
-    let app_name = cli.app.first().expect("No app provided");
+    
+    let app_name = match cli.app.first() {
+
+        Some(name) => name,
+        None => {
+            Cli::command().print_help().unwrap();
+            std::process::exit(0);
+        }  
+    };
+
     let app_args: Vec<&String> = cli.app.iter().skip(1).collect();
 
     // It checks if a graphical interface is already running,
