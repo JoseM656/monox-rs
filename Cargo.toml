@@ -7,3 +7,4 @@ repository = "https://github.com/JoseM656/monox-rs"
 license = "MIT"
 
 [dependencies]
+clap = { version = "4", features = ["derive"] }
