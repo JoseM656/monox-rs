@@ -4,12 +4,15 @@ pub fn run(app: &str) {
 
     print_event(MonoxEvent::Checking("Checking X11...".to_string()));
     check_display();
+    print_event(MonoxEvent::Done);
 
     print_event(MonoxEvent::Checking("Checking xinit installation...".to_string()));
     check_xinit();
+    print_event(MonoxEvent::Done);
 
-    print_event(MonoxEvent::Checking("Checking app requested installation...".to_string()));
+    print_event(MonoxEvent::Checking(format!("Checking '{}' installation...", app)));
     check_app(app);
+    print_event(MonoxEvent::Done);
 }
 
 fn check_display() {
