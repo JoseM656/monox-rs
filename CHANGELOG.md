@@ -10,3 +10,7 @@
 
 - I'm experimenting with printing via terminal.
 - printer.rs is fininished
+
+### 0.1.0
+
+- Actually made a frist version of the lauching system, so I incrased the number of version.

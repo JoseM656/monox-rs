@@ -7,5 +7,6 @@ repository = "https://github.com/JoseM656/monox-rs"
 license = "MIT"
 
 [dependencies]
+tempfile = "3"
 clap = { version = "4", features = ["derive"] }
 which = "8.0.0"

@@ -2,6 +2,7 @@ use clap::{CommandFactory, Parser};
 use cli::Cli;
 
 mod cli;
+mod launcher;
 mod printer;
 mod verify;
 
@@ -22,10 +23,15 @@ fn main() {
 
     let app_args: Vec<&String> = cli.app.iter().skip(1).collect();
 
+    print_event(MonoxEvent::Checking("Starting verification...".to_string()));
     // It checks if a graphical interface is already running,
     // if xinit is installed, and if the app exists. The binary or app have
     // to be in the path.
     verify::run(&app_name);
+    print_event(MonoxEvent::Launching("Finished verification.".to_string()));
 
-    println!("yes {} {:?}", app_name, app_args);
+    print_event(MonoxEvent::Launching(format!("Starting {}", &app_name)));
+    // Launch creating a temporaly file of xinitrc, in that file puts the app and flags.
+    launcher::launch(app_name, &app_args);
+    
 }
