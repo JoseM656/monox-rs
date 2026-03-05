@@ -9,3 +9,4 @@
   of x11, for example.
 
 - I'm experimenting with printing via terminal.
+- printer.rs is fininished

@@ -17,7 +17,7 @@ pub fn run(app: &str) {
 
 fn check_display() {
     if std::env::var("DISPLAY").is_ok() {
-        print_event(MonoxEvent::Error("X11 is already running".to_string()));
+        print_event(MonoxEvent::Error("X11 is already running. Try to run in a tty1 envieroment".to_string()));
         std::process::exit(1);
     }
 }
