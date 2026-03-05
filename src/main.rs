@@ -28,10 +28,10 @@ fn main() {
     // if xinit is installed, and if the app exists. The binary or app have
     // to be in the path.
     verify::run(&app_name);
-    print_event(MonoxEvent::Launching("Finished verification.".to_string()));
+    print_event(MonoxEvent::Checking("Finished verification.".to_string()));
 
-    print_event(MonoxEvent::Launching(format!("Starting {}", &app_name)));
+    print_event(MonoxEvent::Launching(format!("Generating xinitrc file of: {}", &app_name)));
     // Launch creating a temporaly file of xinitrc, in that file puts the app and flags.
     launcher::launch(app_name, &app_args);
-    
+
 }
