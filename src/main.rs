@@ -1,12 +1,12 @@
 use clap::{CommandFactory, Parser};
 use cli::Cli;
 
-mod cli;
-mod launcher;
+#[macro_use]
 mod printer;
-mod verify;
 
-use crate::printer::{MonoxEvent, print_event};
+mod launcher;
+mod cli;
+mod verify;
 
 fn main() {
     // process input
@@ -15,7 +15,7 @@ fn main() {
     let app_name = match cli.app.first() {
         Some(name) => name,
         None => {
-            print_event(MonoxEvent::Error("Invalid argument".to_string()));
+            merror!("Invalid argument");
             Cli::command().print_help().unwrap();
             std::process::exit(0);
         }
@@ -23,15 +23,23 @@ fn main() {
 
     let app_args: Vec<&String> = cli.app.iter().skip(1).collect();
 
-    print_event(MonoxEvent::Checking("Starting verification...".to_string()));
+    // --------------------------------
+    // Verification and lauch app zone
+    // --------------------------------
+
+    // Step 1
+    checking!("Starting verification...");
     // It checks if a graphical interface is already running,
     // if xinit is installed, and if the app exists. The binary or app have
     // to be in the path.
     verify::run(&app_name);
-    print_event(MonoxEvent::Checking("Finished verification.".to_string()));
+    done!();
 
-    print_event(MonoxEvent::Launching(format!("Generating xinitrc file of: {}", &app_name)));
+    // Step 2
+    // session();
+
+    // Step 3
+    launching!("Generating xinitrc file of: {}", &app_name);
     // Launch creating a temporaly file of xinitrc, in that file puts the app and flags.
     launcher::launch(app_name, &app_args);
-
 }

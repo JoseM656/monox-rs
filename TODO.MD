@@ -1,4 +1,4 @@
-- Modify printer.rs and do the macro better "launching(".....") or similar"
+- Modify printer.rs and do the macro better "launching(".....") or similar" ...DONE
 - Make session.rs for set resolution, dbus, audio services and etc.
 - Create a /flag or similar folder to opcional flags.
 - Make /monitor and desing a mini htop-like for debug mode.

@@ -15,3 +15,8 @@
 
 - Actually made a frist version of the lauching system, so I incrased the number of version.
 - Is working!!! but need a lot of improve.
+
+
+### 0.2.0
+
+- printer.rs was too verbose, so I use macros, to simplify, that was a mini refactoring of the code basically
