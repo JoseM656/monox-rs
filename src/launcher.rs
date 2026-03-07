@@ -23,7 +23,7 @@ fn generate_xinitrc(app_name: &str, app_args: &[&String], session: &Session) -> 
     let args_str = args.join(" ");
 
     let xrandr_cmd = match &session.resolution {
-        Some(res) => format!("xrandr --mode {}", res),
+        Some((connector, res)) => format!("xrandr --output {} --mode {}", connector, res),
         None => "xrandr --auto".to_string(),
     };
 

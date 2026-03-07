@@ -2,8 +2,8 @@ use std::process::Child;
 use std::process::Command;
 
 pub struct Session {
-    pub resolution: Option<String>,
-    processes: Vec<Child>, // dbus, pipewire — session kills them on exit
+    pub resolution: Option<(String, String)>,
+    processes: Vec<Child>,
 }
 
 impl Session {
@@ -11,10 +11,7 @@ impl Session {
         let mut processes = vec![];
 
         setup_dbus();
-
-        if let Some(child) = start_audio() {
-            processes.push(child);
-        }
+        processes.extend(start_audio());
 
         Session {
             resolution: detect_resolution(),
@@ -36,13 +33,10 @@ fn setup_dbus() {
 
     if which::which("dbus-launch").is_err() {
         merror!("dbus-launch not found, some apps may not work");
-        return; // If doesn't find dbus continuous, some apps can work anyway.
+        return;
     }
 
-    let output = match std::process::Command::new("dbus-launch")
-        .arg("--sh-syntax")
-        .output()
-    {
+    let output = match Command::new("dbus-launch").arg("--sh-syntax").output() {
         Ok(o) => o,
         Err(_) => {
             merror!("Failed to run dbus-launch");
@@ -50,7 +44,6 @@ fn setup_dbus() {
         }
     };
 
-    // parse "DBUS_SESSION_BUS_ADDRESS='unix:path=...'; export DBUS_SESSION_BUS_ADDRESS;"
     let stdout = String::from_utf8_lossy(&output.stdout);
     for line in stdout.lines() {
         if let Some((key, val)) = parse_dbus_var(line) {
@@ -64,14 +57,12 @@ fn setup_dbus() {
 }
 
 fn parse_dbus_var(line: &str) -> Option<(&str, &str)> {
-    // format: KEY='value'; export KEY;
     let line = line.trim();
     if !line.contains('=') {
         return None;
     }
     let (key, rest) = line.split_once('=')?;
     let val = rest.trim_matches(|c| c == '\'' || c == ';').trim();
-    // Filter only the relevant variables
     if key.starts_with("DBUS_") {
         Some((key, val))
     } else {
@@ -79,29 +70,69 @@ fn parse_dbus_var(line: &str) -> Option<(&str, &str)> {
     }
 }
 
-// Search for audio services, there are the most commun ones
-// but may I can put more.
-fn start_audio() -> Option<Child> {
+fn start_audio() -> Vec<Child> {
     launching!("Setting up audio...");
+    let mut procs = vec![];
 
     if which::which("pipewire").is_ok() {
-        let child = Command::new("pipewire").spawn().ok()?;
+        match Command::new("pipewire").spawn() {
+            Ok(child) => procs.push(child),
+            Err(_) => {
+                merror!("Failed to spawn pipewire");
+                return procs;
+            }
+        }
+
+        if which::which("wireplumber").is_ok() {
+            match Command::new("wireplumber").spawn() {
+                Ok(child) => procs.push(child),
+                Err(_) => merror!("Failed to spawn wireplumber, audio may not work correctly"),
+            }
+        } else {
+            merror!("wireplumber not found, audio may not work correctly");
+        }
+
         done!();
-        return Some(child);
+        return procs;
     }
 
     if which::which("pulseaudio").is_ok() {
-        let child = Command::new("pulseaudio").arg("--start").spawn().ok()?;
+        match Command::new("pulseaudio").arg("--start").spawn() {
+            Ok(child) => procs.push(child),
+            Err(_) => merror!("Failed to spawn pulseaudio"),
+        }
         done!();
-        return Some(child);
+        return procs;
     }
 
     merror!("No audio service found, continuing without audio");
-    None
+    procs
 }
 
-fn detect_resolution() -> Option<String> {
-    // This is the only way I now to ask the resolution whitout x11
-    let modes = std::fs::read_to_string("/sys/class/drm/card0-HDMI-A-1/modes").ok()?;
-    modes.lines().next().map(|s| s.to_string())
+// There is many places where this information can be....
+fn detect_resolution() -> Option<(String, String)> {
+    // (conector, resolucion)
+    let drm_path = std::path::Path::new("/sys/class/drm");
+
+    for entry in std::fs::read_dir(drm_path).ok()?.flatten() {
+        let name = entry.file_name();
+        let name = name.to_string_lossy();
+
+        if !name.contains('-') {
+            continue;
+        }
+
+        let modes_path = entry.path().join("modes");
+        if let Ok(modes) = std::fs::read_to_string(&modes_path) {
+            if let Some(res) = modes.lines().next() {
+                // card0-LVDS-1 → LVDS-1
+                let connector = name.splitn(2, '-').nth(1)?.to_string();
+                checking!("Resolution detected: {} on {}", res, connector);
+                return Some((connector, res.to_string()));
+            }
+        }
+    }
+
+    merror!("Could not detect resolution, falling back to xrandr --auto");
+    None
 }

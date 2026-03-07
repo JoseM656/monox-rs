@@ -28,4 +28,5 @@
 
 ### 0.4.0
 
-- It now receives information from session.rs, such as resolution. There problems but I working in that.
+- launching.rs it now receives information from session.rs, such as resolution. There problems but I working in that.
+

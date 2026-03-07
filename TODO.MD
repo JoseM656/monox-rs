@@ -1,4 +1,7 @@
 - Modify printer.rs and do the macro better "launching(".....") or similar" ...DONE
-- Make session.rs for set resolution, dbus, audio services and etc.
+- Make session.rs for set resolution, dbus, audio services and etc. ...DONE
+- Make resolution works.
+- Make a readme.
+- Fix dbus and audio problems.
 - Create a /flag or similar folder to opcional flags.
 - Make /monitor and desing a mini htop-like for debug mode.
