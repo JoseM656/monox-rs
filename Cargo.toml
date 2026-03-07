@@ -1,6 +1,6 @@
 [package]
 name = "monox"
-version = "0.1.0"
+version = "0.3.0"
 edition = "2024"
 description = "Launch a single GUI app on X11 without a desktop environment"
 repository = "https://github.com/JoseM656/monox-rs"

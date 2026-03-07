@@ -4,8 +4,9 @@ use cli::Cli;
 #[macro_use]
 mod printer;
 
-mod launcher;
 mod cli;
+mod launcher;
+mod session;
 mod verify;
 
 fn main() {
@@ -33,10 +34,10 @@ fn main() {
     // if xinit is installed, and if the app exists. The binary or app have
     // to be in the path.
     verify::run(&app_name);
-    done!();
 
+    checking!("Starting critical services...");
     // Step 2
-    // session();
+    let session = session::start();
 
     // Step 3
     launching!("Generating xinitrc file of: {}", &app_name);

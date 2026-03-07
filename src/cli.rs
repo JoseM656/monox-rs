@@ -3,7 +3,7 @@ use clap::Parser;
 #[derive(Parser)]
 #[command(
     name = "monox",
-    version = "0.1.0",
+    version = "0.3.0",
     about = "Launch a single GUI app on X11 without a desktop environment",
     after_help = "Examples:\n  monox firefox\n  monox gimp ~/photo.png\n  monox --check firefox\n  monox --dry-run chromium"
 )]

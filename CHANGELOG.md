@@ -20,3 +20,8 @@
 ### 0.2.0
 
 - printer.rs was too verbose, so I use macros, to simplify, that was a mini refactoring of the code basically
+
+
+### 0.3.0
+
+- session.rs was implemented in his frist version, it checks dbus, and audio services.
