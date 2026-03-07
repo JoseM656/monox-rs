@@ -25,3 +25,7 @@
 ### 0.3.0
 
 - session.rs was implemented in his frist version, it checks dbus, and audio services.
+
+### 0.4.0
+
+- It now receives information from session.rs, such as resolution. There problems but I working in that.

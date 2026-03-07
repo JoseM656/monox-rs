@@ -1,17 +1,16 @@
+use crate::session::Session;
 use std::fs;
 use std::io::Write;
 use std::os::unix::fs::PermissionsExt;
 use std::process::Command;
-
 use tempfile::NamedTempFile;
 
-
-pub fn launch(app_name: &str, app_args: &[&String]) {
-    let xinitrc = generate_xinitrc(app_name, app_args);
+pub fn launch(app_name: &str, app_args: &[&String], session: &Session) {
+    let xinitrc = generate_xinitrc(app_name, app_args, session);
     start_x(&xinitrc);
 }
 
-fn generate_xinitrc(app_name: &str, app_args: &[&String]) -> NamedTempFile {
+fn generate_xinitrc(app_name: &str, app_args: &[&String], session: &Session) -> NamedTempFile {
     let mut file = match NamedTempFile::new() {
         Ok(f) => f,
         Err(_) => {
@@ -22,9 +21,15 @@ fn generate_xinitrc(app_name: &str, app_args: &[&String]) -> NamedTempFile {
 
     let args: Vec<&str> = app_args.iter().map(|s| s.as_str()).collect();
     let args_str = args.join(" ");
+
+    let xrandr_cmd = match &session.resolution {
+        Some(res) => format!("xrandr --mode {}", res),
+        None => "xrandr --auto".to_string(),
+    };
+
     let content = format!(
-        "#!/bin/sh\nxsetroot -solid black\nexec {} {}\n",
-        app_name, args_str
+        "#!/bin/sh\n{}\nxsetroot -solid black\nexec {} {}\n",
+        xrandr_cmd, app_name, args_str
     );
 
     if let Err(_) = file.write_all(content.as_bytes()) {

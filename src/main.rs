@@ -43,5 +43,5 @@ fn main() {
     // Step 3
     launching!("Generating xinitrc file of: {}", &app_name);
     // Launch creating a temporaly file of xinitrc, in that file puts the app and flags.
-    launcher::launch(app_name, &app_args);
+    launcher::launch(app_name, &app_args, &session);
 }
