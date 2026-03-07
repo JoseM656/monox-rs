@@ -1,4 +1,5 @@
 use std::process::Child;
+use std::process::Command;
 
 pub struct Session {
     pub resolution: Option<String>,
@@ -53,7 +54,10 @@ fn setup_dbus() {
     let stdout = String::from_utf8_lossy(&output.stdout);
     for line in stdout.lines() {
         if let Some((key, val)) = parse_dbus_var(line) {
-            std::env::set_var(key, val);
+            // safe: single-threaded, called before any other threads are spawned
+            unsafe {
+                std::env::set_var(key, val);
+            }
         }
     }
     done!();

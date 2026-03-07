@@ -35,9 +35,10 @@ fn main() {
     // to be in the path.
     verify::run(&app_name);
 
+    // Yes, yes I know a variable declaration in line 41 but this is secuencial!!!
     checking!("Starting critical services...");
     // Step 2
-    let session = session::start();
+    let session = session::Session::start();
 
     // Step 3
     launching!("Generating xinitrc file of: {}", &app_name);
